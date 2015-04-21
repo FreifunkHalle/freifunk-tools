@@ -219,6 +219,17 @@ namespace Freifunk
                this.AdjacenceList[Lq.Key.Value].Add(Lq.Key.Key, new KeyValuePair<double, double>(Nlq, Value));
             }
          }
+         // jedes Teil-VPN nach der Adresse durchsuchen
+         foreach (Dictionary<string, object> VpnConnection in this.VpnAdjacenceList)
+         {
+           foreach (string ip in VpnConnection.Keys)
+           {
+           if (!this.HnaIps.ContainsKey(ip))
+           {
+              HnaIps.Add(ip, null);
+           }
+           }
+         }
       }
 
       // erstellt einen neuen Graphen aus einem anderen mit entfernten Knoten

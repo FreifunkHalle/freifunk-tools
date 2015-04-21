@@ -37,10 +37,16 @@ namespace Freifunk.Webpages
       STime = 8,
       InternetAccess = 16,
       HasTunnelLink = 32,
+      Flags = 64,
+      Alfred158 = 128,
+      Statistics = 256,
       TunnelLinks = 65536,
       OlsrLinks = 131072,
+      Time = MTime | STime, 
+      FfMap = Flags | Alfred158 | Time,
       Map = MTime | Hna | Rate | TunnelLinks | OlsrLinks,
       Wiki = InternetAccess | STime | HasTunnelLink,
+      NodeList = InternetAccess | HasTunnelLink,
       All = Map | Wiki,
       HnaNeeded = InternetAccess | Hna,
       Links = TunnelLinks | OlsrLinks,
@@ -60,6 +66,7 @@ namespace Freifunk.Webpages
       private int GpsIndex;
       private JsonOutputOptions OutputOptions;
       private int InfoCount;
+      protected string BaseJsonObjectName;
 
       internal JsonGenerator(string[] infoNames, int[] infoSteps, bool[] infoValidationRequirements, string[] outputNames, bool[] outputRawValues, int boardInfoIndex, int gpsIndex, JsonOutputOptions outputOptions)
       {
@@ -84,6 +91,7 @@ namespace Freifunk.Webpages
          this.BoardInfoIndex = boardInfoIndex;
          this.GpsIndex = gpsIndex;
          this.OutputOptions = outputOptions;
+         this.BaseJsonObjectName = "topo";
       }
 
       public void ProcessRequest(HttpContext context)
@@ -207,10 +215,10 @@ namespace Freifunk.Webpages
             while (RetriesLeft-- > 0);
          }
          // Ausgabe erstellen
-         context.Response.ContentType = @"text/plain; charset=""utf-8""";
+         context.Response.ContentType = @"application/json; charset=""utf-8""";
          using (JsonWriter Output = new JsonWriter(new StreamWriter(context.Response.OutputStream, new UTF8Encoding())))
          {
-            Output.WriteObjectStart("topo");
+            Output.WriteObjectStart(this.BaseJsonObjectName);
             foreach (Dictionary<int, string> SingleNodeData in NodeData.Values)
                // Knoten nur verarbeiten, wenn Länge und Breite vorhanden sind oder sie nicht notwendig ist
                if (this.GpsIndex < 0 || (SingleNodeData.ContainsKey(this.GpsIndex) && SingleNodeData.ContainsKey(this.GpsIndex + 1)))
@@ -300,8 +308,8 @@ namespace Freifunk.Webpages
             if (Elements[Elements.Count - 1])
                //         this.StreamWriter.WriteLine(",");
                this.StreamWriter.Write(",");
-            //      this.StreamWriter.WriteLine(@"""" + Regex.Escape(name) + @""":{");
-            this.StreamWriter.Write(@"""" + Regex.Escape(name) + @""":{");
+            //      this.StreamWriter.WriteLine(@"""" + name + @""":{");
+            this.StreamWriter.Write(@"""" + name + @""":{");
             Elements[Elements.Count - 1] = true;
             Elements.Add(false);
             return this;
@@ -315,7 +323,7 @@ namespace Freifunk.Webpages
                if (Elements[Elements.Count - 1])
                   //            this.StreamWriter.WriteLine(",");
                   this.StreamWriter.Write(",");
-               this.StreamWriter.Write(@"""" + Regex.Escape(name) + @""":" + value);
+               this.StreamWriter.Write(@"""" + name + @""":" + value);
                Elements[Elements.Count - 1] = true;
             }
             return this;
@@ -329,7 +337,7 @@ namespace Freifunk.Webpages
                if (Elements[Elements.Count - 1])
                   //            this.StreamWriter.WriteLine(",");
                   this.StreamWriter.Write(",");
-               this.StreamWriter.Write(@"""" + Regex.Escape(name) + @""":""" + Regex.Escape(value) + @"""");
+               this.StreamWriter.Write(@"""" + name + @""":""" + value + @"""");
                Elements[Elements.Count - 1] = true;
             }
             return this;
