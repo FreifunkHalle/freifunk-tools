@@ -224,6 +224,49 @@ namespace Freifunk.Webpages
                if (this.GpsIndex < 0 || (SingleNodeData.ContainsKey(this.GpsIndex) && SingleNodeData.ContainsKey(this.GpsIndex + 1)))
                {
                   Output.WriteObjectStart(Text = SingleNodeData[this.InfoCount]);
+                  // flags schreiben
+                  if ((this.OutputOptions & JsonOutputOptions.Flags) != 0)
+                  {
+                     Output.WriteObjectStart("flags");
+                     //Output.WriteText("gateway", SingleNodeData[this.InfoCount + 6]);
+                     //Output.WriteText("online", Graph.GetAdjacentNodes(Text).Count != 0 ?"true":"false");
+                     Output.WriteObjectEnd();
+                  }
+
+				  //alfred schreiben
+                  if ((this.OutputOptions & JsonOutputOptions.Alfred158) != 0)
+                  {
+                    Output.WriteObjectStart("nodeinfo");
+                      Output.WriteObjectStart("hardware");
+                        Output.WriteText("model", "");
+                      Output.WriteObjectEnd();
+                      Output.WriteText("hostname", "");
+                      Output.WriteObjectStart("network");
+                        Output.WriteText("mac", ""); // bei uns ip
+                      Output.WriteObjectEnd();
+                      Output.WriteText("node_id", ""); //ip ohne Doppelpunkt
+                      Output.WriteObjectStart("software");
+                        Output.WriteObjectStart("firmware");
+                          Output.WriteText("base", "");
+                          Output.WriteText("release", "");
+                        Output.WriteObjectEnd();
+                      Output.WriteObjectEnd();
+                    Output.WriteObjectEnd();
+                  }
+
+				  //statistics schreiben
+                  if ((this.OutputOptions & JsonOutputOptions.Statistics) != 0)
+                  {
+                    Output.WriteObjectStart("statistics");
+                      Output.WriteText("uptime", "0");
+                      Output.WriteText("memory_usage", "0");
+                      Output.WriteText("clients", "0");
+                      Output.WriteText("rootfs_usage", "0");
+                      Output.WriteText("loadavg", "0");
+                      Output.WriteText("gateway", "");
+                    Output.WriteObjectEnd();
+                  }
+                  
                   // Links schreiben
                   if ((this.OutputOptions & JsonOutputOptions.Links) != 0)
                   {
